@@ -1,8 +1,3 @@
-// TODO https://www.digitalocean.com/community/tutorial_series/how-to-code-in-node-js
-// TODO https://www.digitalocean.com/community/tutorials/how-to-write-and-run-your-first-program-in-node-js
-
-// TODO make the thing
-
 // this automatically loads "config/default.yaml" if existant in the current working directory
 // TODO or the one this file is located in, via: process.env["NODE_CONFIG_DIR"] = __dirname + "/configDir/";
 // TODO config, see: https://github.com/lorenwest/node-config/wiki/Configuration-Files
@@ -276,7 +271,6 @@ async function run() {
   const oldStats = await readStats(config.cacheFile)
   logger.debug(oldStats)
 
-  // TODO if oldstats empty, skip straight to writing new stats?
   const firstRun = Object.keys(oldStats).length === 0
   if (firstRun) {
     config.warning("Since no cached stats were present, I've got nothing to compare them against. Run me again and I will.")
@@ -323,3 +317,10 @@ async function run() {
 }
 
 run()
+
+// TODO fix standard formatter, also document in readme, maybe make git hook? idk
+// TODO do the production config thing, document in readme too, add production config to gitignore
+// TODO make some things more elegant, maybe split into modules, make sure i haven't missed anything from the haskell version, etc.
+// TODO maybe typescript and/or unit tests
+// TODO move all of this into src, with a minimal index.js?
+// TODO write readme – take from haskell one, with good setup instructions
