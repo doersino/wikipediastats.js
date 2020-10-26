@@ -76,6 +76,8 @@ class Logger {
     if (this.v0 >= 0) {
       if (message.hasOwnProperty("stack")) {
         this.#err("Warning – A bad thing has happened, but we'll keep going:\n" + message.stack)
+      } else if (typeof message != "string") {
+        this.#err("Warning – A bad thing has happened, but we'll keep going:\n" + JSON.stringify(message))
       } else {
         this.#err("Warning – A bad thing has happened, but we'll keep going:\n" + message)
       }
@@ -86,8 +88,10 @@ class Logger {
     if (this.v0 >= 0) {
       if (message.hasOwnProperty("stack")) {
         this.#err("Error – A bad thing has happened:\n" + message.stack)
+      } else if (typeof message != "string") {
+        this.#err("Warning – A bad thing has happened:\n" + JSON.stringify(message))
       } else {
-        this.#err("Error – A bad thing has happened:\n" + message)
+        this.#err("Warning – A bad thing has happened:\n" + message)
       }
       process.exit(1)
     }
@@ -179,14 +183,12 @@ function writeStats(path, stats) {
   return fs.writeFile(path, JSON.stringify(stats))
 }
 
-// list intersection generally works like this: list1.filter(a => list2.some(b => a.userId === b.userId));
 function compareStats(oldStats, newStats) {
-  let comp = {};
+  let comp = [];
   Object.keys(oldStats).forEach(subdomain => {
     if (newStats.hasOwnProperty(subdomain)) {
       const oldS = oldStats[subdomain]
       const newS = newStats[subdomain]
-      let cmp = {}
       Object.keys(oldS).forEach(stat => {
         if (newS.hasOwnProperty(stat)) {
           const o = oldS[stat];
@@ -198,39 +200,52 @@ function compareStats(oldStats, newStats) {
 
           const milestoneReached = newEclipsesOld && aboveThreshold && firstDigitChanged
           if (milestoneReached) {
-            let v = `${n.toString()[0]}${"".padStart(o.toString().length - 1, "0")}`
+            let v = parseInt(`${n.toString()[0]}${"".padStart(o.toString().length - 1, "0")}`)
             //console.log(subdomain, stat, v)
-            cmp[stat] = v;
+            comp.push({subdomain: subdomain, stat: stat, value: v});
           }
         }
       })
-      if (!(Object.keys(cmp).length === 0)) {
-        comp[subdomain] = cmp;
-      }
     }
   });
 
   return comp;
 }
 
-// TODO dict intersection: list1.filter(a => list2.some(b => a.userId === b.userId));
-// via https://stackoverflow.com/a/54763194
+function formatStat(n) {
+  if (n < 10000) {
+    return n;
+  }
+  if (n < 1000000) {
+    l = n.toString().length
+    return `${n.toString().slice(0, l-3)},${n.toString().slice(l-3)}`
+  }
+  if (n < 1000000000) {
+    return `${parseInt(n/1000000)} million`
+  }
+  if (n < 1000000000000) {
+    return `${parseInt(n/1000000000)} billion`
+  }
+  return `${parseInt(n/1000000000000)} trillion`
+}
 
+function prettyComparedStats(comparedStats, wikipedias) {
+  return comparedStats.map(stat => {
 
-// TODO https://www.npmjs.com/package/twitter
-/* const client = new Twitter({
-  consumer_key: config.get('twitter.consumerKey'),
-  consumer_secret: config.get('twitter.consumerSecret'),
-  access_token_key: config.get('twitter.accessTokenKey'),
-  access_token_secret: config.get('twitter.accessTokenSecret')
-})
-client.post('statuses/update', { status: 'testing' })
-  .then(tweet => {
-    console.log(tweet)
+    // TODO eh
+    let language = wikipedias.find(wiki => wiki.subdomain == stat.subdomain).language
+
+    let text = ""
+    if (stat.value.toString().charAt(0) === '1') {
+      text += "Hooray! "
+    }
+    text += `The ${language} edition of #Wikipedia `
+    text += statDescriptions[stat.stat](formatStat(stat.value))
+    text += `! Explore more stats here: https://${stat.subdomain}.wikipedia.org/wiki/Special:Statistics`
+
+    return text
   })
-  .catch(error => {
-    throw error
-  }) */
+}
 
 async function run() {
   logger = new Logger(config.verbosity)
@@ -258,41 +273,53 @@ async function run() {
   logger.debug(newStats)
 
   logger.status("Reading previous stats from cache...")
-  let oldStats = await readStats(config.cacheFile)
+  const oldStats = await readStats(config.cacheFile)
   logger.debug(oldStats)
 
   // TODO if oldstats empty, skip straight to writing new stats?
-  //if (!(Object.keys(oldStats).length === 0))
-  logger.status("Comparing newly downloaded stats with cached stats...")
-  let comparedStats = compareStats(oldStats, newStats)
-  console.log(comparedStats)
+  const firstRun = Object.keys(oldStats).length === 0
+  if (firstRun) {
+    config.warning("Since no cached stats were present, I've got nothing to compare them against. Run me again and I will.")
+  } else {
 
-  logger.status("Turning comparison results into tweet texts...")
-  // TODO implement
+    logger.status("Comparing newly downloaded stats with cached stats...")
+    const comparedStats = compareStats(oldStats, newStats)
+    logger.debug(comparedStats)
 
-  // TODO tweeting (or message if tweeting disabled)
-  // TODO config.tweetLimit
+    logger.status("Turning comparison results into tweet texts and limiting to at most " + config.tweetLimit + "...")
+    let tweetTexts = prettyComparedStats(comparedStats, wikipedias)
+    tweetTexts = tweetTexts.slice(0, config.tweetLimit)
+    logger.debug(tweetTexts)
+    //tweetTexts = ["testing 1 2 3 4", "is this thing on? now", "testing more!!"]
+
+    const tweetingPossible = !(!config.twitter.consumerKey || !config.twitter.consumerSecret || !config.twitter.accessTokenKey || !config.twitter.accessTokenSecret);
+    if (!tweetingPossible) {
+      logger.warning("Tweeting is disabled since not all API keys and secrets have been specified.")
+    } else {
+      const tweetingNecessary = tweetTexts.length > 0
+      if (!tweetingNecessary) {
+        logger.status("Nothing to tweet – no new milestones have been reached.")
+      } else {
+        logger.status("Tweeting...")
+        const client = new Twitter({
+          consumer_key: config.get('twitter.consumerKey'),
+          consumer_secret: config.get('twitter.consumerSecret'),
+          access_token_key: config.get('twitter.accessTokenKey'),
+          access_token_secret: config.get('twitter.accessTokenSecret')
+        })
+        await Promise.all(tweetTexts.map(async text => {
+          await client.post('statuses/update', { status: text })
+            .then(tweet => logger.debug(tweet))
+            .catch(error => logger.error(error))
+          }))
+      }
+    }
+  }
 
   logger.status("Writing updated stats to cache...")
   await writeStats(config.cacheFile, newStats).catch(error => logger.error(error));
 
   logger.status("All done.")
-
-
-
-
-  // TODO
-  /*
-  load wikipedias list
-  then
-  for each wikipedia, load it and extract stats
-  then
-  load cache or, if not possible, make empty cache/skip tweeting
-  then
-  compare and construct tweets and send em
-  then
-  write new cache to disk
-  */
 }
 
 run()
