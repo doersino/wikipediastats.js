@@ -12,8 +12,10 @@ TODO clone, install
 
 TODO install for dev how?
 
+can optionally set env var NODE_CONFIG_DIR to an absolute path if you please
 
-
+"if you wish to..., copy the twitter section of default.yaml to production.yaml and run with NODE_CONFIG_ENV=production"
+https://github.com/lorenwest/node-config/wiki/Environment-Variables
 make production.yaml in config, with twitter stuff filled in and possibly other settings changed too
 NODE_CONFIG_ENV=production node index.js
 

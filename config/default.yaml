@@ -13,6 +13,11 @@ cacheFile: stats.json
 #    for debugging.
 verbosity: 2
 
+# Where the bot will log its progress. Logging is always done at maximum
+# verbosity – you can, however, disable logging by setting and empty value. The
+# same absolute vs. relative path caveats as for the cache file apply here.
+logFile: bot.log
+
 # Limit the bot's focus to the N largest Wikipedias by articles. (Or, rather, by
 # their order on https://meta.wikimedia.org/wiki/List_of_Wikipedias.) At the
 # time of writing, there are 313 Wikipedias, so setting this to 999 approximates
