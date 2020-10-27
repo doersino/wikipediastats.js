@@ -228,7 +228,7 @@ async function run (config) {
 
   const firstRun = Object.keys(oldStats).length === 0
   if (firstRun) {
-    config.warning("Since no cached stats were present, I've got nothing to compare them against. Run me again and I will.")
+    logger.warning("Since no cached stats were present, I've got nothing to compare them against. Run me again and I will.")
   } else {
     logger.status('Comparing newly downloaded stats with cached stats...')
     const comparedStats = compareStats(oldStats, newStats)
