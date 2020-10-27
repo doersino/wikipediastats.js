@@ -105,3 +105,4 @@ dist
 
 # -----
 stats.json
+config/production.yaml

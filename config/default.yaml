@@ -1,0 +1,38 @@
+# Where the statistics cache for all Wikipedias will be written to. It's best to
+# supply an absolute path here – relative paths will be interpreted with regard
+# to the current working directory when running the bot. If you're only going to
+# ever run the bot from a given, known working directory, feel free to ignore
+# this advice.
+cacheFile: stats.json
+
+# How noisy the output should be.
+# 0: Silent if things run smoothly but noisy if they don't, great when
+#    running as a cronjob.
+# 1: Normal. Status messages.
+# 2: Verbose. Status messages and very verbose intermediate results, handy
+#    for debugging.
+verbosity: 2
+
+# Limit the bot's focus to the N largest Wikipedias by articles. (Or, rather, by
+# their order on https://meta.wikimedia.org/wiki/List_of_Wikipedias.) At the
+# time of writing, there are 313 Wikipedias, so setting this to 999 approximates
+# infinity with sufficient headroom.
+wikipediaLimit: 999
+
+# The maximim number of tweets the bot will post at a time. Useful to avoid
+# exceeding API limits just in case many Wikipedias cross milestones at the same
+# time, or if something breaks.
+tweetLimit: 10
+
+# Information required for posting to Twitter using its OAuth 1a authentication
+# method. Check out the following website for an explanation of how to generate
+# these keys/tokens/secrets for your Twitter account:
+# https://iag.me/socialmedia/how-to-create-a-twitter-app-in-8-easy-steps/
+# Note: If any of these four values is left empty, Twitter posting will be
+# disabled, but the rest of the program still runs through, which is useful for
+# testing (or impatiently waiting for Twitter to approve your dev application).
+twitter:
+  consumerKey:
+  consumerSecret:
+  accessTokenKey:
+  accessTokenSecret:
