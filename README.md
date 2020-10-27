@@ -38,7 +38,7 @@ This will populate the *stats cache*, based on which newly reached milestones ar
 If you're actually intending to use this as a Twitter bot, set up a cronjob to execute `node .` every hour or so, roughly like this:
 
 ```cron
-0 * * * * cd PATH_TO_WIKIPEDIASTATSJS; NODE_CONFIG_ENV=production node .
+0 * * * * cd PATH_TO_WIKIPEDIASTATSJS && NODE_CONFIG_ENV=production node .
 ```
 
 (`NODE_CONFIG_ENV=production` is only [needed](https://github.com/lorenwest/node-config/wiki/Environment-Variables) if the Twitter API credentials are kept in `config/production.yaml`.)
