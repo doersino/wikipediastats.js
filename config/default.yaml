@@ -33,9 +33,14 @@ tweetLimit: 10
 # method. Check out the following website for an explanation of how to generate
 # these keys/tokens/secrets for your Twitter account:
 # https://iag.me/socialmedia/how-to-create-a-twitter-app-in-8-easy-steps/
-# Note: If any of these four values is left empty, Twitter posting will be
+# Note 1: If any of these four values is left empty, Twitter posting will be
 # disabled, but the rest of the program still runs through, which is useful for
 # testing (or impatiently waiting for Twitter to approve your dev application).
+# Node 2: Instead of filling these values in here, it's recommened to override
+# these settings in a production.yaml file located next to this file, and
+# running the bot with the NODE_CONFIG_ENV environment variable set to
+# "production" (e.g. via "NODE_CONFIG_ENV=production node ."). This is cleaner
+# than entering your Twitter authentication data into a file tracked by Git.
 twitter:
   consumerKey:
   consumerSecret:

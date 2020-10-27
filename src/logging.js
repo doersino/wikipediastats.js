@@ -36,7 +36,7 @@ class Logger {
     return message
   }
 
-  __prefix(prefix, message) {
+  __prefix (prefix, message) {
     // Stringify
     message = '' + message
 
