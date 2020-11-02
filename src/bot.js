@@ -204,9 +204,15 @@ async function run (config) {
   let n = 1
   const newStatsPromises = wikipedias.map(async wiki => {
     // Throw warnings instead of errors.
-    const s = await getStats(wiki).catch(error => logger.warning(error))
-
-    logger.status(`Successfully got stats for ${wiki.subdomain}.wikipedia.org (${n}/${m}).`)
+    const s = await getStats(wiki)
+      .then(s => {
+        logger.status(`Successfully got stats for ${wiki.subdomain}.wikipedia.org (${n}/${m}).`)
+        return s
+      }).catch(error => {
+        logger.status(`Failed to get stats for ${wiki.subdomain}.wikipedia.org (${n}/${m}):`)
+        logger.warning(error)
+        return {}
+      })
 
     // Instead of "n++", i should probably be using an atomic, but it seems to
     // work – and since it's just for progress metering, it doesn't really
