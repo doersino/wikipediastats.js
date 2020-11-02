@@ -18,6 +18,10 @@ const statDescriptions = {
   'mw-statistics-hook': s => `now contains more than ${s} words`
 }
 
+// Helper functions.
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+const randomInteger = (min, max) => Math.floor(Math.random() * (max - min) + min)
+
 // Download and parse list of Wikipedias.
 function getWikipedias () {
   const wikipediasTableURL = 'https://meta.wikimedia.org/wiki/List_of_Wikipedias/Table'
@@ -59,11 +63,9 @@ function getWikipedias () {
     })
 }
 
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
-const random = (min, max) => Math.floor(Math.random() * (max - min) + min)
-
-function getStats (w) {
-  return sleep(random(0, 2 * 60 * 1000))
+function getStats (w, delay = 0) {
+  // Sleep for a certain length of time to circumvent rate limiting.
+  return sleep(delay)
     .then(() => {
       const wikipediaStatsURL = `https://${w.subdomain}.wikipedia.org/wiki/Special:Statistics?uselang=en`
       return axios.get(wikipediaStatsURL)
@@ -209,7 +211,7 @@ async function run (config) {
   const m = wikipedias.length
   let n = 1
   const newStatsPromises = wikipedias.map(async wiki => {
-    const s = await getStats(wiki)
+    const s = await getStats(wiki, randomInteger(0, config.requestSpread * 1000))
       .then(s => {
         logger.status(`Successfully got stats for ${wiki.subdomain}.wikipedia.org (${n}/${m}).`)
         return s
