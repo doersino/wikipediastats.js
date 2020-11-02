@@ -24,7 +24,7 @@ logFile: bot.log
 # infinity with sufficient headroom.
 wikipediaLimit: 999
 
-# Spread requests to the statistics pages of the various Wikipedias over at
+# Spread requests to the statistics pages of all the various Wikipedias over at
 # least this many seconds. In my experience, not doing this can lead to rate
 # limiting and connection timeouts (although I'm not sure if this is really a
 # rate limiting thing or if it was a temprary network weirdness – either way,
