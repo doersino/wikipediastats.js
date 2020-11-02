@@ -59,33 +59,39 @@ function getWikipedias () {
     })
 }
 
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+const random = (min, max) => Math.floor(Math.random() * (max - min) + min)
+
 function getStats (w) {
-  const wikipediaStatsURL = `https://${w.subdomain}.wikipedia.org/wiki/Special:Statistics?uselang=en`
-  return axios.get(wikipediaStatsURL)
-    .then(src => {
-      // Parse HTML code.
-      const $ = cheerio.load(src.data)
+  return sleep(random(0, 10000))
+    .then(() => {
+      const wikipediaStatsURL = `https://${w.subdomain}.wikipedia.org/wiki/Special:Statistics?uselang=en`
+      return axios.get(wikipediaStatsURL)
+        .then(src => {
+          // Parse HTML code.
+          const $ = cheerio.load(src.data)
 
-      const stats = {}
-      Object.keys(statDescriptions).forEach(stat => {
-        // Extract value of current stat.
-        let value = $(`.${stat} .mw-statistics-numbers`).text()
+          const stats = {}
+          Object.keys(statDescriptions).forEach(stat => {
+            // Extract value of current stat.
+            let value = $(`.${stat} .mw-statistics-numbers`).text()
 
-        // If the current stat doesn't exist for a given Wikipedia, value will
-        // be an empty string – in this case, omit this stat for the current
-        // Wikipedia. The comparison method is tuned to account for this.
-        if (value === '') {
-          return
-        }
+            // If the current stat doesn't exist for a given Wikipedia, value will
+            // be an empty string – in this case, omit this stat for the current
+            // Wikipedia. The comparison method is tuned to account for this.
+            if (value === '') {
+              return
+            }
 
-        // That's Numberwang!
-        value = parseInt(value.replace(/\D/g, ''))
+            // That's Numberwang!
+            value = parseInt(value.replace(/\D/g, ''))
 
-        // Accumulate.
-        stats[stat] = value
-      })
+            // Accumulate.
+            stats[stat] = value
+          })
 
-      return stats
+          return stats
+        })
     })
 }
 
