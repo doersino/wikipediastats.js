@@ -63,7 +63,7 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 const random = (min, max) => Math.floor(Math.random() * (max - min) + min)
 
 function getStats (w) {
-  return sleep(random(0, 30000))
+  return sleep(random(0, 2 * 60 * 1000))
     .then(() => {
       const wikipediaStatsURL = `https://${w.subdomain}.wikipedia.org/wiki/Special:Statistics?uselang=en`
       return axios.get(wikipediaStatsURL)
