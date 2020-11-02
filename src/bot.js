@@ -63,7 +63,7 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 const random = (min, max) => Math.floor(Math.random() * (max - min) + min)
 
 function getStats (w) {
-  return sleep(random(0, 10000))
+  return sleep(random(0, 30000))
     .then(() => {
       const wikipediaStatsURL = `https://${w.subdomain}.wikipedia.org/wiki/Special:Statistics?uselang=en`
       return axios.get(wikipediaStatsURL)
@@ -209,13 +209,15 @@ async function run (config) {
   const m = wikipedias.length
   let n = 1
   const newStatsPromises = wikipedias.map(async wiki => {
-    // Throw warnings instead of errors.
     const s = await getStats(wiki)
       .then(s => {
         logger.status(`Successfully got stats for ${wiki.subdomain}.wikipedia.org (${n}/${m}).`)
         return s
-      }).catch(error => {
+      })
+      .catch(error => {
         logger.status(`Failed to get stats for ${wiki.subdomain}.wikipedia.org (${n}/${m}):`)
+        // Throw warnings instead of errors – one or two Wikipedias might just
+        // randomly fail on each run.
         logger.warning(error)
         return {}
       })
