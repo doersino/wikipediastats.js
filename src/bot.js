@@ -134,13 +134,13 @@ function compareStats (oldStats, newStats) {
           // These three conditions must be met for a new milestone.
           const newEclipsesOld = n > o
           const aboveThreshold = n > 10
-          const firstDigitChanged = o.toString()[0] !== n.toString()[0]
+          const firstDigitChanged = n.toString()[0] !== o.toString()[0]
 
           const milestoneReached = newEclipsesOld && aboveThreshold && firstDigitChanged
           if (milestoneReached) {
             // Round down to the nearest X000...0. I'm sure this could be done
             // much more elegantly.
-            const v = parseInt(`${n.toString()[0]}${''.padStart(o.toString().length - 1, '0')}`)
+            const v = parseInt(`${n.toString()[0]}${''.padStart(n.toString().length - 1, '0')}`)
 
             milestones.push({ subdomain: subdomain, stat: stat, value: v })
           }
