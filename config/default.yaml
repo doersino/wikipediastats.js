@@ -29,7 +29,7 @@ wikipediaLimit: 999
 # limiting and connection timeouts (although I'm not sure if this is really a
 # rate limiting thing or if it was a temprary network weirdness – either way,
 # spreading the load across a bit more time is the considerate thing to do).
-requestSpread: 120
+requestSpread: 240
 
 # The maximim number of tweets the bot will post at a time. Useful to avoid
 # exceeding API limits just in case many Wikipedias cross milestones at the same
