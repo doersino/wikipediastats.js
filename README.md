@@ -1,5 +1,9 @@
 # wikipediastats.js
 
+The bot powered by this code, [@wikipediastats](https://twitter.com/wikipediastats), is now inactive due to frequent HTTPS errors/timeouts while fetching the various Wikipedias' stats pages – clearly, scraping them (even if it's only every four hours, with plenty of time between requests) isn't an intended use case.
+
+---
+
 *A Node.js-powered Twitter bot that posts milestones and statistics of various Wikipedias.*
 
 While the main purpose of building this Twitter bot was to get myself acquainted with Node.js, it's actually doing semi-interesting stuff. Whenever you run this program, it
